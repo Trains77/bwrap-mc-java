@@ -4,7 +4,7 @@ Tries to sandbox Minecraft in a per instance way in PrismLauncher
 
 The idea of the script is to provide stronger sandboxing in Minecraft instances by sandboxing only Minecraft itself, and not the launcher, and takes advantage of PrismLauncher's Wrapper command option to do so
 
-The script relies on bwrap for sandboxing, slirp4netns for networking, and sommelier for X11 sharing
+The script relies on bwrap for sandboxing, slirp4netns for networking, and sommelier for *sandboxed* X11 sharing
 
 Most likely does not work with Flatpak versions of the launcher
 
@@ -19,13 +19,13 @@ Do note this script is made primarily made for my personal use, so there are som
 
 Additionally, the scripts accepts settings in the form of environment variables set within the launcher, the following are:
 
-AUDIO_BACKEND - Can be either "pipewire", "pulseaudio", "none", or "both" defines which audio system to share with the sandbox, defaults to "none"
+AUDIO_BACKEND - Can be "pipewire", "pulseaudio", "none", or "both" defines which audio system to share with the sandbox, defaults to "none"
 
 DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, defaults to "true" 
 
 DISABLE_NETWORKING - Can be either either "true" or "false", defines whether or not the sandbox should get any networking, defaults to false
 
-ENABLE_X11 - Can be either "true" or "false", Defines, whether or not the sandbox should get access to a X11 server via Sommelier, defaults to false
+SHARE_X11 - Can be "true", "sommelier", or "false". Defines whether or not the sandbox should get direct access to the X11 server, a sandboxed X11 server through Sommelier, or no X11 server at all, defaults to false
 
 MORE_VERBOSE - Does nothing, defaults to false
 

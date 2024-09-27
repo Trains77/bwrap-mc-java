@@ -25,7 +25,9 @@ fi
 
 # -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
 
-if [ "$ENABLE_X11" = true ]; then
+if [ "$SHARE_X11" = true ]; then
+export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/3581} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/3581}"
+elif [ "$SHARE_X11" = "sommelier" ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix/X58 /tmp/.X11-unix/X58  --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY :58"
 sommelier --noop-driver -X --x-display=58 --direct-scale --display=wayland-0 --glamor --force-drm-device=/dev/dri/renderD128 --xwayland-gl-driver-path=/usr/lib --peer-cmd-prefix=/lib64/ld-linux-x86-64.so.2 --no-exit-with-child --fullscreen-mode=immersive true &
 export SOMMELIER_PID=$(echo $!)
@@ -85,6 +87,8 @@ bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --ro-bind-try "$INST_MC_DIR/mods" "$INST_MC_DIR/mods" \
 --tmpfs "$INST_MC_DIR/.cache" \
 --clearenv \
+--perms 700 \
+--tmpfs /run/user/3581 \
 $X11_FLAGS \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes \
@@ -95,8 +99,6 @@ $BIND_ADDITIONAL_FOLDER_ARGS \
 $BIND_ADDITIONAL_FOLDER_RO_ARGS \
 $MINECRAFT_SHARE_ARGS \
 --tmpfs $HOME/.cache \
---perms 700 \
---tmpfs /run/user/3581 \
 $AUDIO_FLAGS \
 --tmpfs /run/user/3581/dconf \
 --symlink usr/lib /lib \
@@ -163,6 +165,6 @@ wait $BWRAP_PID
 
 # Minecraft should have stopped, cleaning up any remaining processes
 kill -SIGHUP $SLIRP4NET_PID
-if [ "$ENABLE_X11" = true ]; then
+if [ "$SHARE_X11" = "sommelier" ]; then
 kill -SIGTERM $SOMMELIER_PID
 fi
