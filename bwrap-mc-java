@@ -62,23 +62,13 @@ fi
 
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS; do
-# I actually don't know how the script drops folders with spaces, but it does seem to, sooo
-if [[ "$i" = *" "* ]]; then
-echo "Unfortunately, the script cannot handle spaces at the moment, not binding $i"
-else
-export BIND_ADDITIONAL_FOLDER_ARGS="--bind-try $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
-fi
+export BIND_ADDITIONAL_FOLDER_ARGS="--bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
 done
 fi
 
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS_RO+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS; do
-# I actually don't know how the script drops folders with spaces, but it does seem to, sooo
-if [[ "$i" = *" "* ]]; then
-echo "Unfortunately, the script cannot handle spaces at the moment, not binding $i"
-else
-export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind-try $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
-fi
+export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
 done
 fi
 
