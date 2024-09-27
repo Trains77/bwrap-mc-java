@@ -13,6 +13,7 @@ Put this script as the Wrapper command in PrismLauncher
 Do note this script is made primarily made for my personal use, so there are some things in it that I use that you may want to change/remove
 
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
+- The current users uid is by default mapped to 3581 in the sandbox, which shouldn't break anyhting but you can change it to be the user's normal uid near the top of the script
 - Discord's socket is not bound in the sandbox, you would need to add that argument yourself
 - Some versions or mods may not work with the sandbox
 - Tries to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf

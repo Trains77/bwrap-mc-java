@@ -11,6 +11,7 @@ unset SLIRP4NET_PID
 unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
 USERID="$(id -u)"
+SUB_USERID=3581
 
 if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
 export SECCOMP_FILTER_ARGS="--seccomp 10"
@@ -26,7 +27,7 @@ fi
 # -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
 
 if [ "$SHARE_X11" = true ]; then
-export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/3581} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/3581}"
+export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID}"
 elif [ "$SHARE_X11" = "sommelier" ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix/X58 /tmp/.X11-unix/X58  --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY :58"
 sommelier --noop-driver -X --x-display=58 --direct-scale --display=wayland-0 --glamor --force-drm-device=/dev/dri/renderD128 --xwayland-gl-driver-path=/usr/lib --peer-cmd-prefix=/lib64/ld-linux-x86-64.so.2 --no-exit-with-child --fullscreen-mode=immersive true &
@@ -35,11 +36,11 @@ sleep .3
 fi
 
 if [ "$AUDIO_BACKEND" = "pipewire" ]; then
-AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/$SUB_USERID/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
 elif [ "$AUDIO_BACKEND" = "pulseaudio" ]; then
-AUDIO_FLAGS="--ro-bind /run/user/$USERID/pulse /run/user/3581/pulse"
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pulse /run/user/$SUB_USERID/pulse"
 elif [ "$AUDIO_BACKEND" = "both" ]; then
-AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire --ro-bind /run/user/$USERID/pulse /run/user/3581/pulse"
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/$SUB_USERID/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire --ro-bind /run/user/$USERID/pulse /run/user/$SUB_USERID/pulse"
 fi
 
 if [ "$DISABLE_NETWORKING" = true ]; then
@@ -88,7 +89,7 @@ bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --tmpfs "$INST_MC_DIR/.cache" \
 --clearenv \
 --perms 700 \
---tmpfs /run/user/3581 \
+--tmpfs /run/user/$SUB_USERID \
 $X11_FLAGS \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes \
@@ -100,7 +101,7 @@ $BIND_ADDITIONAL_FOLDER_RO_ARGS \
 $MINECRAFT_SHARE_ARGS \
 --tmpfs $HOME/.cache \
 $AUDIO_FLAGS \
---tmpfs /run/user/3581/dconf \
+--tmpfs /run/user/$SUB_USERID/dconf \
 --symlink usr/lib /lib \
 --symlink usr/lib64 /lib64 \
 --symlink usr/bin /bin \
@@ -132,9 +133,9 @@ $AUDIO_FLAGS \
 --ro-bind /sys/devices/pci0000:00 /sys/devices/pci0000:00 \
 --proc /proc \
 --hostname orange \
---ro-bind /run/user/$USERID/wayland-0 /run/user/3581/wayland-0 \
+--ro-bind /run/user/$USERID/wayland-0 /run/user/$SUB_USERID/wayland-0 \
 --perms 0750 \
---dir /run/user/3581/dconf \
+--dir /run/user/$SUB_USERID/dconf \
 --as-pid-1 \
 --cap-drop all \
 --remount-ro / \
@@ -143,9 +144,9 @@ $AUDIO_FLAGS \
 --setenv WAYLAND_DISPLAY "$WAYLAND_DISPLAY" \
 --setenv HOME $HOME \
 --setenv USER $(whoami) \
---setenv XDG_RUNTIME_DIR /run/user/3581 \
---uid 3581 \
---gid 3581 \
+--setenv XDG_RUNTIME_DIR /run/user/$SUB_USERID \
+--uid $SUB_USERID \
+--gid $SUB_USERID \
 --new-session \
 $SECCOMP_FILTER_ARGS \
 10< ~/.sandboxing/seccomp_default_filter.bpf \
