@@ -1,0 +1,149 @@
+#!/bin/bash
+# XAUTHORITY_NEW=$(echo $XAUTHORITY | replace 1000 3581)
+# echo $PWD
+unset X11_FLAGS
+unset ENABLE_NETWORKING
+unset BWRAP_PID
+unset SANDBOX_PID
+unset SLIRP4NET_PID
+unset SOMMELIER_PID
+unset SLIRP_ADDITIONAL_ARGS
+# xdg-run/app/com.discordapp.Discord
+# xdg-run/.flatpak/dev.vencord.Vesktop:create
+# -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
+# pulseaudio
+# --bind $HOME/.config/pulse/cookie $HOME/.config/pulse/cookie
+# --ro-bind /run/user/1000/pulse /run/user/3581/pulse
+# --bind "$XAUTHORITY" "$XAUTHORITY_NEW" \
+# --setenv XAUTHORITY $XAUTHORITY_NEW \
+# --setenv DISPLAY $DISPLAY \
+#  --ro-bind /etc/java-8-openjdk /etc/java-8-openjdk \
+
+
+if [ "$ENABLE_X11" = true ]; then
+export X11_FLAGS="--bind /tmp/.X11-unix/X58 /tmp/.X11-unix/X58  --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY :58"
+sommelier --noop-driver -X --x-display=58 --direct-scale --display=wayland-0 --glamor --force-drm-device=/dev/dri/renderD128 --xwayland-gl-driver-path=/usr/lib --peer-cmd-prefix=/lib64/ld-linux-x86-64.so.2 --no-exit-with-child --fullscreen-mode=immersive true &
+# Xephyr -fullscreen -glamor :58 &
+export SOMMELIER_PID=$(echo $!)
+sleep .3
+fi
+
+if [ "$AUDIO_BACKEND" = "pipewire" ]; then
+AUDIO_FLAGS="--ro-bind /run/user/1000/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
+elif [ "$AUDIO_BACKEND" = "pulseaudio" ]; then
+AUDIO_FLAGS="--ro-bind /run/user/1000/pulse /run/user/3581/pulse"
+fi
+
+if [ "$DISABLE_NETWORKING" = true ]; then
+export ENABLE_NETWORKING="--unshare-net"
+else
+export ENABLE_NETWORKING="--share-net"
+fi
+
+if ! [ "$DISABLE_LOOPBACK" = false ]; then
+export SLIRP_ADDITIONAL_ARGS="--disable-host-loopback $SLIRP_ADDITIONAL_ARGS"
+else
+echo Host Loopback IP is 10.0.2.2
+fi
+if [ "$VPN_CONNECT_ONLY" = "true" ]; then
+export SLIRP_ADDITIONAL_ARGS="--outbound-addr=wg0-mullvad $SLIRP_ADDITIONAL_ARGS"
+elif [ "$VPN_CONNECT_ONLY" = "force-disabled" ]; then
+export SLIRP_ADDITIONAL_ARGS="--outbound-addr=wlan0 $SLIRP_ADDITIONAL_ARGS"
+fi
+
+# if [ [ "$MORE_VERBOSE" = true ]; then
+# export 
+
+bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
+--perms 0555 \
+--tmpfs / \
+--die-with-parent \
+--tmpfs /tmp \
+--ro-bind "$INST_DIR" "$INST_DIR" \
+--bind "$INST_MC_DIR" "$INST_MC_DIR" \
+--ro-bind-try "$INST_MC_DIR/coremods" "$INST_MC_DIR/coremods" \
+--ro-bind-try "$INST_MC_DIR/mods" "$INST_MC_DIR/mods" \
+--tmpfs "$INST_MC_DIR/.cache" \
+--clearenv \
+$X11_FLAGS \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta \
+--bind $HOME/Pictures/minecraft $HOME/Pictures/minecraft \
+--ro-bind-try $HOME/Minecraft/lib $HOME/Minecraft/lib \
+--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots \
+--bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves \
+--bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks \
+--bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt \
+--ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks \
+--tmpfs $HOME/.cache \
+--perms 700 \
+--tmpfs /run/user/3581 \
+$AUDIO_FLAGS \
+--tmpfs /run/user/3581/dconf \
+--symlink usr/lib /lib \
+--symlink usr/lib64 /lib64 \
+--symlink usr/bin /bin \
+--symlink usr/bin /sbin \
+--symlink lib /usr/lib64 \
+--ro-bind /usr/lib /usr/lib \
+--ro-bind /usr/lib/jvm /usr/lib/jvm \
+--ro-bind /usr/share/PrismLauncher /usr/share/PrismLauncher \
+--ro-bind /usr/share/X11/locale /usr/share/X11/locale \
+--ro-bind /usr/share/glvnd /usr/share/glvnd \
+--ro-bind /usr/share/X11/xkb /usr/share/X11/xkb \
+--ro-bind /etc/fonts /etc/fonts \
+--ro-bind /etc/timezone /etc/timezone \
+--ro-bind /etc/resolv.conf /etc/resolv.conf \
+--ro-bind /etc/alsa /etc/alsa \
+--ro-bind /etc/hosts /etc/hosts \
+--ro-bind /usr/share/ca-certificates /usr/share/ca-certificates \
+--ro-bind /etc/ssl /etc/ssl \
+--ro-bind /etc/ca-certificates /etc/ca-certificates \
+--ro-bind /etc/java21-openjdk /etc/java21-openjdk \
+--ro-bind /etc/java-8-openjdk /etc/java-8-openjdk \
+--ro-bind /etc/java17-openjdk /etc/java17-openjdk \
+--unshare-all \
+--unshare-user \
+--disable-userns \
+--dev /dev \
+--dev-bind /dev/dri /dev/dri \
+--ro-bind /sys/dev/char /sys/dev/char \
+--ro-bind /sys/devices/pci0000:00 /sys/devices/pci0000:00 \
+--proc /proc \
+--hostname orange \
+--ro-bind /run/user/1000/wayland-0 /run/user/3581/wayland-0 \
+--perms 0750 \
+--dir /run/user/3581/dconf \
+--as-pid-1 \
+--cap-drop all \
+--remount-ro / \
+--setenv XDG_SESSION_TYPE wayland \
+--setenv PATH /usr/bin \
+--setenv WAYLAND_DISPLAY "$WAYLAND_DISPLAY" \
+--setenv HOME $HOME \
+--setenv USER $(whoami) \
+--setenv XDG_RUNTIME_DIR /run/user/3581 \
+--uid 3581 \
+--gid 3581 \
+--new-session \
+--seccomp 10 \
+10< ~/.sandboxing/seccomp_default_filter.bpf \
+$ENABLE_NETWORKING $* &
+# bash $HOME/Scripts/container-setup
+
+export BWRAP_PID=$(echo $!)
+sleep .2
+export SANDBOX_PID="$(pgrep -P $!)"
+echo Sandbox Process PID: $SANDBOX_PID
+
+slirp4netns --configure $SLIRP_ADDITIONAL_ARGS --disable-dns $SANDBOX_PID eth0 &
+export SLIRP4NET_PID=$(echo $!)
+
+wait $BWRAP_PID
+kill -SIGHUP $SLIRP4NET_PID
+if [ "$ENABLE_X11" = true ]; then
+kill -SIGTERM $SOMMELIER_PID
+fi
