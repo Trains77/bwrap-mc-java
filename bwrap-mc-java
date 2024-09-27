@@ -60,6 +60,28 @@ if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
 export MINECRAFT_SHARE_ARGS="--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots --bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves --bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks --bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt --ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks"
 fi
 
+if ! [ -z ${BIND_ADDITIONAL_FOLDERS+x} ]; then
+for i in $BIND_ADDITIONAL_FOLDERS; do
+# I actually don't know how the script drops folders with spaces, but it does seem to, sooo
+if [[ "$i" = *" "* ]]; then
+echo "Unfortunately, the script cannot handle spaces at the moment, not binding $i"
+else
+export BIND_ADDITIONAL_FOLDER_ARGS="--bind-try $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
+fi
+done
+fi
+
+if ! [ -z ${BIND_ADDITIONAL_FOLDERS_RO+x} ]; then
+for i in $BIND_ADDITIONAL_FOLDERS; do
+# I actually don't know how the script drops folders with spaces, but it does seem to, sooo
+if [[ "$i" = *" "* ]]; then
+echo "Unfortunately, the script cannot handle spaces at the moment, not binding $i"
+else
+export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind-try $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
+fi
+done
+fi
+
 bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 0555 \
 --tmpfs / \
@@ -77,8 +99,8 @@ $X11_FLAGS \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta \
---bind $HOME/Pictures/minecraft $HOME/Pictures/minecraft \
---ro-bind-try $HOME/Minecraft/lib $HOME/Minecraft/lib \
+$BIND_ADDITIONAL_FOLDER_ARGS \
+$BIND_ADDITIONAL_FOLDER_RO_ARGS \
 $MINECRAFT_SHARE_ARGS \
 --tmpfs $HOME/.cache \
 --perms 700 \

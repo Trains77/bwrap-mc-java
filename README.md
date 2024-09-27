@@ -13,12 +13,9 @@ Put this script as the Wrapper command in PrismLauncher
 Do note this script is made primarily made for my personal use, so there are some things in it that I use that you may want to change/remove
 
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
-- ~/Minecraft/lib will try to be mounted to the sandbox, as this is why I store my patched glfw for certain versions of Minceraft, can simply remove this from the script if you want
 - Discord's socket is not bound in the sandbox, you would need to add that argument yourself
-- ~/Pictures/minecraft is bound in the sandbox
 - Some versions or mods may not work with the sandbox
 - Tries to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf
-- TLDR some things in the script may not work or be not how you want them to be
 
 Additionally, the scripts accepts settings in the form of environment variables set within the launcher, the following are:
 
@@ -34,4 +31,8 @@ MORE_VERBOSE - Does nothing, defaults to false
 
 VPN_CONNECT_ONLY - Can be either "true", "force-disabled", or "false", Defines if Minecraft should be forced to use a vpn connection, force-disabled tries to force the sandbox to *not* use the vpn, defaults to false
 
-BIND_HOME_MINECRAFT_FOLDER_ITEMS - If the following folders in ~/.minecraft should be bound into the sandbox: screenshots, saves, shaderpacks, optionsof.txt, and read-only resourcepacks, useful if you want to share these folders between instances
+BIND_HOME_MINECRAFT_FOLDER_ITEMS - If the following folders in ~/.minecraft should be bound into the sandbox: screenshots, saves, shaderpacks, optionsof.txt, and read-only resourcepacks, useful if you want to share these folders between instances, defaults to false
+
+BIND_ADDITIONAL_FOLDERS - Mount additional space-seperated files and folders into the sandbox, does not support paths with a space in them
+
+BIND_ADDITIONAL_FOLDERS_RO - Same as BIND_ADDITIONAL_FOLDERS but bind as read only
