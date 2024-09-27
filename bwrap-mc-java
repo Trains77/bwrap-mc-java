@@ -12,6 +12,17 @@ unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
 USERID="$(id -u)"
 
+if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
+export SECCOMP_FILTER_ARGS="--seccomp 10"
+else
+echo no seccomp filter found, creating empty file to prevent script from erroring out
+if ! test -d ~/.sandboxing; then
+mkdir ~/.sandboxing
+fi
+touch ~/.sandboxing/seccomp_default_filter.bpf
+echo
+fi
+
 # -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
 
 if [ "$ENABLE_X11" = true ]; then
@@ -120,7 +131,7 @@ $AUDIO_FLAGS \
 --uid 3581 \
 --gid 3581 \
 --new-session \
---seccomp 10 \
+$SECCOMP_FILTER_ARGS \
 10< ~/.sandboxing/seccomp_default_filter.bpf \
 $ENABLE_NETWORKING $* &
 # bash $HOME/Scripts/container-setup
