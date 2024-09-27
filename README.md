@@ -19,7 +19,7 @@ Do note this script is made primarily made for my personal use, so there are som
 
 Additionally, the scripts accepts settings in the form of environment variables set within the launcher, the following are:
 
-AUDIO_BACKEND - Can be either "pipewire" or "pulseaudio" defines which audio system to share with the sandbox, defaults to "none"
+AUDIO_BACKEND - Can be either "pipewire", "pulseaudio", "none", or "both" defines which audio system to share with the sandbox, defaults to "none"
 
 DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, defaults to "true" 
 

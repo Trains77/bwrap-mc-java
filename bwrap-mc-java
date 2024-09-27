@@ -36,6 +36,8 @@ if [ "$AUDIO_BACKEND" = "pipewire" ]; then
 AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
 elif [ "$AUDIO_BACKEND" = "pulseaudio" ]; then
 AUDIO_FLAGS="--ro-bind /run/user/$USERID/pulse /run/user/3581/pulse"
+elif [ "$AUDIO_BACKEND" = "both" ]; then
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire --ro-bind /run/user/$USERID/pulse /run/user/3581/pulse"
 fi
 
 if [ "$DISABLE_NETWORKING" = true ]; then
