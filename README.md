@@ -12,7 +12,7 @@ Put this script as the Wrapper command in PrismLauncher
 
 Do note this script is made primarily made for my personal use, so there are some things in it that I use that you may want to change/remove
 
-- Sandbox assumes if a vpn interface exists, that it is wg0-mullvad, and non-vpn interface is wlan0.
+- Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
 - ~/Minecraft/lib will try to be mounted to the sandbox, as this is why I store my patched glfw for certain versions of Minceraft, can simply remove this from the script if you want
 - Discord's socket is not bound in the sandbox, you would need to add that argument yourself
 - ~/Pictures/minecraft is bound in the sandbox

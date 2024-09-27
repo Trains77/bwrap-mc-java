@@ -1,5 +1,8 @@
 #!/bin/bash
 
+VPN_INTERFACE=wg0-mullvad
+WAN_INTERFACE=wlan0
+
 unset X11_FLAGS
 unset ENABLE_NETWORKING
 unset BWRAP_PID
@@ -7,11 +10,7 @@ unset SANDBOX_PID
 unset SLIRP4NET_PID
 unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
-
 USERID="$(id -u)"
-VPN_INTERFACE=wg0-mullvad
-
-
 
 # -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
 
@@ -43,7 +42,7 @@ fi
 if [ "$VPN_CONNECT_ONLY" = "true" ]; then
 export SLIRP_ADDITIONAL_ARGS="--outbound-addr=$VPN_INTERFACE $SLIRP_ADDITIONAL_ARGS"
 elif [ "$VPN_CONNECT_ONLY" = "force-disabled" ]; then
-export SLIRP_ADDITIONAL_ARGS="--outbound-addr=wlan0 $SLIRP_ADDITIONAL_ARGS"
+export SLIRP_ADDITIONAL_ARGS="--outbound-addr=$WAN_INTERFACE $SLIRP_ADDITIONAL_ARGS"
 fi
 
 if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
