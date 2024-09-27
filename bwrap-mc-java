@@ -1,6 +1,5 @@
 #!/bin/bash
-# XAUTHORITY_NEW=$(echo $XAUTHORITY | replace 1000 3581)
-# echo $PWD
+
 unset X11_FLAGS
 unset ENABLE_NETWORKING
 unset BWRAP_PID
@@ -8,30 +7,25 @@ unset SANDBOX_PID
 unset SLIRP4NET_PID
 unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
-# xdg-run/app/com.discordapp.Discord
-# xdg-run/.flatpak/dev.vencord.Vesktop:create
-# -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
-# pulseaudio
-# --bind $HOME/.config/pulse/cookie $HOME/.config/pulse/cookie
-# --ro-bind /run/user/1000/pulse /run/user/3581/pulse
-# --bind "$XAUTHORITY" "$XAUTHORITY_NEW" \
-# --setenv XAUTHORITY $XAUTHORITY_NEW \
-# --setenv DISPLAY $DISPLAY \
-#  --ro-bind /etc/java-8-openjdk /etc/java-8-openjdk \
 
+USERID="$(id -u)"
+VPN_INTERFACE=wg0-mullvad
+
+
+
+# -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
 
 if [ "$ENABLE_X11" = true ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix/X58 /tmp/.X11-unix/X58  --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY :58"
 sommelier --noop-driver -X --x-display=58 --direct-scale --display=wayland-0 --glamor --force-drm-device=/dev/dri/renderD128 --xwayland-gl-driver-path=/usr/lib --peer-cmd-prefix=/lib64/ld-linux-x86-64.so.2 --no-exit-with-child --fullscreen-mode=immersive true &
-# Xephyr -fullscreen -glamor :58 &
 export SOMMELIER_PID=$(echo $!)
 sleep .3
 fi
 
 if [ "$AUDIO_BACKEND" = "pipewire" ]; then
-AUDIO_FLAGS="--ro-bind /run/user/1000/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/3581/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
 elif [ "$AUDIO_BACKEND" = "pulseaudio" ]; then
-AUDIO_FLAGS="--ro-bind /run/user/1000/pulse /run/user/3581/pulse"
+AUDIO_FLAGS="--ro-bind /run/user/$USERID/pulse /run/user/3581/pulse"
 fi
 
 if [ "$DISABLE_NETWORKING" = true ]; then
@@ -45,14 +39,16 @@ export SLIRP_ADDITIONAL_ARGS="--disable-host-loopback $SLIRP_ADDITIONAL_ARGS"
 else
 echo Host Loopback IP is 10.0.2.2
 fi
+
 if [ "$VPN_CONNECT_ONLY" = "true" ]; then
-export SLIRP_ADDITIONAL_ARGS="--outbound-addr=wg0-mullvad $SLIRP_ADDITIONAL_ARGS"
+export SLIRP_ADDITIONAL_ARGS="--outbound-addr=$VPN_INTERFACE $SLIRP_ADDITIONAL_ARGS"
 elif [ "$VPN_CONNECT_ONLY" = "force-disabled" ]; then
 export SLIRP_ADDITIONAL_ARGS="--outbound-addr=wlan0 $SLIRP_ADDITIONAL_ARGS"
 fi
 
-# if [ [ "$MORE_VERBOSE" = true ]; then
-# export 
+if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
+export MINECRAFT_SHARE_ARGS="--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots --bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves --bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks --bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt --ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks"
+fi
 
 bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 0555 \
@@ -73,11 +69,7 @@ $X11_FLAGS \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta \
 --bind $HOME/Pictures/minecraft $HOME/Pictures/minecraft \
 --ro-bind-try $HOME/Minecraft/lib $HOME/Minecraft/lib \
---bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots \
---bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves \
---bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks \
---bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt \
---ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks \
+$MINECRAFT_SHARE_ARGS \
 --tmpfs $HOME/.cache \
 --perms 700 \
 --tmpfs /run/user/3581 \
@@ -114,7 +106,7 @@ $AUDIO_FLAGS \
 --ro-bind /sys/devices/pci0000:00 /sys/devices/pci0000:00 \
 --proc /proc \
 --hostname orange \
---ro-bind /run/user/1000/wayland-0 /run/user/3581/wayland-0 \
+--ro-bind /run/user/$USERID/wayland-0 /run/user/3581/wayland-0 \
 --perms 0750 \
 --dir /run/user/3581/dconf \
 --as-pid-1 \
@@ -139,10 +131,13 @@ sleep .2
 export SANDBOX_PID="$(pgrep -P $!)"
 echo Sandbox Process PID: $SANDBOX_PID
 
+# get slirp4netns running for networking
 slirp4netns --configure $SLIRP_ADDITIONAL_ARGS --disable-dns $SANDBOX_PID eth0 &
 export SLIRP4NET_PID=$(echo $!)
 
 wait $BWRAP_PID
+
+# Minecraft should have stopped, cleaning up any remaining processes
 kill -SIGHUP $SLIRP4NET_PID
 if [ "$ENABLE_X11" = true ]; then
 kill -SIGTERM $SOMMELIER_PID

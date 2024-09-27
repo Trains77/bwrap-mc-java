@@ -14,11 +14,9 @@ Do note this script is made primarily made for my personal use, so there are som
 
 - Sandbox assumes if a vpn interface exists, that it is wg0-mullvad, and non-vpn interface is wlan0.
 - ~/Minecraft/lib will try to be mounted to the sandbox, as this is why I store my patched glfw for certain versions of Minceraft, can simply remove this from the script if you want
-- Some folders in ~/.minecraft are bind mounted to the sandbox, usually things one may want to have shared between instances, like saves, resourcepacks or shaderpacks. You can remove these arguments from the script if you want.
 - Discord's socket is not bound in the sandbox, you would need to add that argument yourself
 - ~/Pictures/minecraft is bound in the sandbox
 - Some versions or mods may not work with the sandbox
-- Assumes running user is UID 1000
 - Tries to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf
 - TLDR some things in the script may not work or be not how you want them to be
 
@@ -35,3 +33,5 @@ ENABLE_X11 - Can be either "true" or "false", Defines, whether or not the sandbo
 MORE_VERBOSE - Does nothing, defaults to false
 
 VPN_CONNECT_ONLY - Can be either "true", "force-disabled", or "false", Defines if Minecraft should be forced to use a vpn connection, force-disabled tries to force the sandbox to *not* use the vpn, defaults to false
+
+BIND_HOME_MINECRAFT_FOLDER_ITEMS - If the following folders in ~/.minecraft should be bound into the sandbox: screenshots, saves, shaderpacks, optionsof.txt, and read-only resourcepacks, useful if you want to share these folders between instances
