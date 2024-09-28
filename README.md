@@ -2,15 +2,15 @@
 
 Tries to sandbox Minecraft in a per instance way in PrismLauncher
 
-- Does not work with Flatpak version
+- Does not work with Flatpak version of the launcher
 
-The idea of the script is to provide stronger sandboxing in Minecraft instances by sandboxing only Minecraft itself, and not the launcher, and takes advantage of PrismLauncher's Wrapper command option to do so
+The goal of the script is to provide stronger sandboxing by isolating just the Minecraft game itself, and not the launcher
 
-The script relies on bwrap for sandboxing, slirp4netns for networking, and sommelier for *sandboxed* X11 sharing
+The script requires both bwrap and slirp4netns, can also optionally use Sommelier for X11 sandboxing,
 
-Put this script as the Wrapper command in PrismLauncher 
+To use the script, set it to be the wrapper command in your launcher's settings
 
-Do note this script is made primarily made for my personal use, so there are some things in it that I use that you may want to change/remove
+Do note this script is made primarily made for my own personal use, so there are some things in it that I use/want that you may want to change or remove
 
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
 - The current users uid is by default mapped to 3581 in the sandbox, which shouldn't break anyhting but you can change it to be the user's normal uid near the top of the script

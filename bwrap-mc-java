@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# Some variables you can tweak
 VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
+SUB_USERID=3581
+SANDBOX_HOSTNAME=orange
 
+# Make sure some variables are cleared, and set additional variables needed
 unset X11_FLAGS
 unset ENABLE_NETWORKING
 unset BWRAP_PID
@@ -11,8 +15,8 @@ unset SLIRP4NET_PID
 unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
 USERID="$(id -u)"
-SUB_USERID=3581
 
+# Check to make sure ~/.sandboxing/seccomp_default_filter.bpf exists, and if it doesn't, create it to ensure the script doesn't error out
 if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
 export SECCOMP_FILTER_ARGS="--seccomp 10"
 else
@@ -24,7 +28,7 @@ touch ~/.sandboxing/seccomp_default_filter.bpf
 echo
 fi
 
-# -Dorg.lwjgl.glfw.libname=$HOME/Minecraft/lib/libglfw.so.3.4 
+# use environment variables to determine exact settings for the sandbox
 
 if [ "$SHARE_X11" = true ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID}"
@@ -77,6 +81,7 @@ export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_A
 done
 fi
 
+# Nested bwrap because permission issues with slirp4netns, the first bwrap s meant to have --unshare-net regardless of networking settings
 bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 0555 \
 --tmpfs / \
@@ -132,7 +137,7 @@ $AUDIO_FLAGS \
 --ro-bind /sys/dev/char /sys/dev/char \
 --ro-bind /sys/devices/pci0000:00 /sys/devices/pci0000:00 \
 --proc /proc \
---hostname orange \
+--hostname $SANDBOX_HOSTNAME \
 --ro-bind /run/user/$USERID/wayland-0 /run/user/$SUB_USERID/wayland-0 \
 --perms 0750 \
 --dir /run/user/$SUB_USERID/dconf \
@@ -151,9 +156,9 @@ $AUDIO_FLAGS \
 $SECCOMP_FILTER_ARGS \
 10< ~/.sandboxing/seccomp_default_filter.bpf \
 $ENABLE_NETWORKING $* &
-# bash $HOME/Scripts/container-setup
-
 export BWRAP_PID=$(echo $!)
+
+# Wait for bwrap to start
 sleep .2
 export SANDBOX_PID="$(pgrep -P $!)"
 echo Sandbox Process PID: $SANDBOX_PID
@@ -162,9 +167,10 @@ echo Sandbox Process PID: $SANDBOX_PID
 slirp4netns --configure $SLIRP_ADDITIONAL_ARGS --disable-dns $SANDBOX_PID eth0 &
 export SLIRP4NET_PID=$(echo $!)
 
+# Wait for Minecraft to exit before continuing
 wait $BWRAP_PID
 
-# Minecraft should have stopped, cleaning up any remaining processes
+# Minecraft should have stopped by now, so terminate any remaining processes there may be
 kill -SIGHUP $SLIRP4NET_PID
 if [ "$SHARE_X11" = "sommelier" ]; then
 kill -SIGTERM $SOMMELIER_PID
