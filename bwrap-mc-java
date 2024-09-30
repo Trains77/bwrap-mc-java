@@ -71,6 +71,12 @@ if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
 export MINECRAFT_SHARE_ARGS="--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots --bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves --bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks --bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt --ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks"
 fi
 
+# if [ "$ALLOW_DISCORD_SOCKET" = "true" ]; then
+# if test -L "$XDG_RUNTIME_DIR/discord-ipc-0"; then
+# export DISCORD_BIND_ARGS="--ro-bind-try $(readlink -f $XDG_RUNTIME_DIR/discord-ipc-0) --ro-bind-try $XDG_RUNTIME_DIR/discord-ipc-0"
+# export DISCORD_BIND_ARGS="--ro-bind-try "
+# fi
+
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS; do
 export BIND_ADDITIONAL_FOLDER_ARGS="--bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
