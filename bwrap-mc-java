@@ -19,12 +19,14 @@ USERID="$(id -u)"
 # Check to make sure ~/.sandboxing/seccomp_default_filter.bpf exists, and if it doesn't, create it to ensure the script doesn't error out
 if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
 export SECCOMP_FILTER_ARGS="--seccomp 10"
+export SECCOMP_FILE_PATH="$HOME/.sandboxing/seccomp_default_filter.bpf"
 else
-echo no seccomp filter found, creating empty file to prevent script from erroring out
-if ! test -d ~/.sandboxing; then
-mkdir ~/.sandboxing
-fi
-touch ~/.sandboxing/seccomp_default_filter.bpf
+# echo no seccomp filter found, creating empty file to prevent script from erroring out
+# if ! test -d ~/.sandboxing; then
+# mkdir ~/.sandboxing
+# fi
+# touch ~/.sandboxing/seccomp_default_filter.bpf
+export SECCOMP_FILE_PATH="/dev/null"
 echo
 fi
 
@@ -81,7 +83,8 @@ export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_A
 done
 fi
 
-# Nested bwrap because permission issues with slirp4netns, the first bwrap s meant to have --unshare-net regardless of networking settings
+# Nested bwrap because permission issues with using slirp4netns directly on sandbox, you can use this method to run slirp4netns on Flatpak apps as well!
+# the first bwrap is meant to have --unshare-net regardless of networking settings
 bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 0555 \
 --tmpfs / \
@@ -154,7 +157,7 @@ $AUDIO_FLAGS \
 --gid $SUB_USERID \
 --new-session \
 $SECCOMP_FILTER_ARGS \
-10< ~/.sandboxing/seccomp_default_filter.bpf \
+10< "$SECCOMP_FILE_PATH" \
 $ENABLE_NETWORKING $* &
 export BWRAP_PID=$(echo $!)
 

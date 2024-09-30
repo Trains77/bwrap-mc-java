@@ -16,7 +16,7 @@ Do note this script is made primarily made for my own personal use, so there are
 - The current users uid is by default mapped to 3581 in the sandbox, which shouldn't break anyhting but you can change it to be the user's normal uid near the top of the script
 - Discord's socket is not bound in the sandbox, you would need to add that argument yourself
 - Some versions or mods may not work with the sandbox, such as the Essentials mod
-- Tries to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf
+- The script will try to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf if it exists
 
 ## Variables
 
