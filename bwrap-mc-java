@@ -84,7 +84,7 @@ done
 fi
 
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS_RO+x} ]; then
-for i in $BIND_ADDITIONAL_FOLDERS; do
+for i in $BIND_ADDITIONAL_FOLDERS_RO; do
 export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
 done
 fi
