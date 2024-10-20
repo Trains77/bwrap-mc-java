@@ -5,6 +5,7 @@ VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
 SUB_USERID=3581
 SANDBOX_HOSTNAME=orange
+PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
 
 # Make sure some variables are cleared, and set additional variables needed
 unset X11_FLAGS
@@ -105,12 +106,12 @@ bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 700 \
 --tmpfs /run/user/$SUB_USERID \
 $X11_FLAGS \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/skins $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/skins \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons \
---ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/meta \
+--ro-bind $PRISMLAUNCHER_FOLDER/assets $PRISMLAUNCHER_FOLDER/assets \
+--ro-bind $PRISMLAUNCHER_FOLDER/assets/skins $PRISMLAUNCHER_FOLDER/assets/skins \
+--ro-bind $PRISMLAUNCHER_FOLDER/assets/indexes $PRISMLAUNCHER_FOLDER/assets/indexes \
+--ro-bind $PRISMLAUNCHER_FOLDER/libraries $PRISMLAUNCHER_FOLDER/libraries \
+--ro-bind $PRISMLAUNCHER_FOLDER/icons $PRISMLAUNCHER_FOLDER/icons \
+--ro-bind $PRISMLAUNCHER_FOLDER/meta $PRISMLAUNCHER_FOLDER/meta \
 $BIND_ADDITIONAL_FOLDER_ARGS \
 $BIND_ADDITIONAL_FOLDER_RO_ARGS \
 $MINECRAFT_SHARE_ARGS \

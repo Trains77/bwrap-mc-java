@@ -19,6 +19,7 @@ Do note this script is made primarily made for my own personal use, so there are
 - Some versions or mods may not work with the sandbox
 	+ Mods that self update themselves may not work 
 - The script will try to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf if it exists
+- The PRISMLAUNCHER_FOLDER variable stored inside the script is set to the Flatpak version's location ~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher not the non-Flatpak's location ~/.local/share/PrismLauncher
 
 ## Variables
 
