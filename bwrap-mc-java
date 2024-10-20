@@ -106,6 +106,7 @@ bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --tmpfs /run/user/$SUB_USERID \
 $X11_FLAGS \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets \
+--ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/skins $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/skins \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/assets/indexes \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/libraries \
 --ro-bind $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons $HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/icons \
