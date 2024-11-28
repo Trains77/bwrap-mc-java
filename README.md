@@ -13,8 +13,6 @@ To use the script, set it to be the wrapper command in your launcher's settings
 Do note this script is made primarily made for my own personal use, so there are some things in it that I use/want that you may want to change or remove
 
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
-- The current users uid is by default mapped to 3581 in the sandbox, which shouldn't break anyhting but you can change it to be the user's normal uid near the top of the script
-- Discord's socket is not bound in the sandbox, you would need to add that argument yourself
 - Instances whose paths include a space do not work
 - Some versions or mods may not work with the sandbox
 	+ Mods that self update themselves may not work 
@@ -26,6 +24,8 @@ Do note this script is made primarily made for my own personal use, so there are
 Additionally, the scripts accepts settings in the form of environment variables set within the launcher, the following are:
 
 AUDIO_BACKEND - Can be "pipewire", "pulseaudio", "none", or "both" defines which audio system to share with the sandbox, defaults to "none"
+
+ENABLE_DISCORD - Can be either "true" or "false", when true, tries to bind $XDG_RUNTIME_DIR/discord-ipc-0 to the sandbox, useful if you want Discord Rich Presence, if $XDG_RUNTIME_DIR/discord-ipc-0 is a symlink, the script will attempt derefernce links and bind the actual socket file
 
 DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, defaults to "true" 
 

@@ -5,9 +5,9 @@ VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
 # SUB_USERID=3581
 SUB_USERID="$(id -u)"
-SANDBOX_HOSTNAME=orange
-PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
-# PRISMLAUNCHER_FOLDER="$HOME/.local/share/PrismLauncher"
+SANDBOX_HOSTNAME=orangepc
+# PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+PRISMLAUNCHER_FOLDER="$HOME/.local/share/PrismLauncher"
 
 # Make sure some variables are cleared, and set additional variables needed
 unset X11_FLAGS
@@ -19,7 +19,7 @@ unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
 USERID="$(id -u)"
 
-# Check to make sure ~/.sandboxing/seccomp_default_filter.bpf exists, and if it doesn't, create it to ensure the script doesn't error out
+# Check to make sure ~/.sandboxing/seccomp_default_filter.bpf exists, and if it doesn't, use /dev/null to prevent erroring out
 if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
 export SECCOMP_FILTER_ARGS="--seccomp 10"
 export SECCOMP_FILE_PATH="$HOME/.sandboxing/seccomp_default_filter.bpf"
@@ -34,6 +34,11 @@ echo
 fi
 
 # use environment variables to determine exact settings for the sandbox
+
+if [ "$ENABLE_DISCORD" = true ]; then
+DISCORD_TRUE_PATH="$(realpath $XDG_RUNTIME_DIR/discord-ipc-0)"
+DISCORD_BIND_ARGS="--ro-bind-try $DISCORD_TRUE_PATH $XDG_RUNTIME_DIR/discord-ipc-0"
+fi
 
 if [ "$SHARE_X11" = true ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID}"
@@ -74,12 +79,6 @@ if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
 export MINECRAFT_SHARE_ARGS="--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots --bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves --bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks --bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt --ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks"
 fi
 
-# if [ "$ALLOW_DISCORD_SOCKET" = "true" ]; then
-# if test -L "$XDG_RUNTIME_DIR/discord-ipc-0"; then
-# export DISCORD_BIND_ARGS="--ro-bind-try $(readlink -f $XDG_RUNTIME_DIR/discord-ipc-0) --ro-bind-try $XDG_RUNTIME_DIR/discord-ipc-0"
-# export DISCORD_BIND_ARGS="--ro-bind-try "
-# fi
-
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS; do
 export BIND_ADDITIONAL_FOLDER_ARGS="--bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
@@ -116,6 +115,7 @@ $X11_FLAGS \
 --ro-bind $PRISMLAUNCHER_FOLDER/meta $PRISMLAUNCHER_FOLDER/meta \
 $BIND_ADDITIONAL_FOLDER_ARGS \
 $BIND_ADDITIONAL_FOLDER_RO_ARGS \
+$DISCORD_BIND_ARGS \
 $MINECRAFT_SHARE_ARGS \
 --tmpfs $HOME/.cache \
 $AUDIO_FLAGS \
