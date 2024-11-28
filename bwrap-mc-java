@@ -3,9 +3,10 @@
 # Some variables you can tweak
 VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
-SUB_USERID=3581
+SUB_USERID=1000
 SANDBOX_HOSTNAME=orange
 PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+# PRISMLAUNCHER_FOLDER="$HOME/.local/share/PrismLauncher"
 
 # Make sure some variables are cleared, and set additional variables needed
 unset X11_FLAGS
@@ -90,7 +91,7 @@ export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_A
 done
 fi
 
-# Nested bwrap because permission issues with using slirp4netns directly on sandbox, you can use this method to run slirp4netns on Flatpak apps as well!
+# Nested bwrap because permission issues I got with using slirp4netns directly on the sandbox, you can use this method to run slirp4netns on Flatpak apps as well!
 # the first bwrap is meant to have --unshare-net regardless of networking settings
 bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --perms 0555 \
@@ -107,7 +108,7 @@ bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
 --tmpfs /run/user/$SUB_USERID \
 $X11_FLAGS \
 --ro-bind $PRISMLAUNCHER_FOLDER/assets $PRISMLAUNCHER_FOLDER/assets \
---ro-bind $PRISMLAUNCHER_FOLDER/assets/skins $PRISMLAUNCHER_FOLDER/assets/skins \
+--bind $PRISMLAUNCHER_FOLDER/assets/skins $PRISMLAUNCHER_FOLDER/assets/skins \
 --ro-bind $PRISMLAUNCHER_FOLDER/assets/indexes $PRISMLAUNCHER_FOLDER/assets/indexes \
 --ro-bind $PRISMLAUNCHER_FOLDER/libraries $PRISMLAUNCHER_FOLDER/libraries \
 --ro-bind $PRISMLAUNCHER_FOLDER/icons $PRISMLAUNCHER_FOLDER/icons \
