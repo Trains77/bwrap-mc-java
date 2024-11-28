@@ -3,7 +3,8 @@
 # Some variables you can tweak
 VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
-SUB_USERID=1000
+# SUB_USERID=3581
+SUB_USERID="$(id -u)"
 SANDBOX_HOSTNAME=orange
 PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
 # PRISMLAUNCHER_FOLDER="$HOME/.local/share/PrismLauncher"
