@@ -15,7 +15,7 @@ Do note this script is made primarily made for my own personal use, so there are
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
 - Instances whose paths include a space do not work
 - Some versions or mods may not work with the sandbox
-	+ Mods that self update themselves may not work 
+	+ Mods that self update themselves might not work 
 - The script will try to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf if it exists
 - The PRISMLAUNCHER_FOLDER variable stored inside the script is set to the Flatpak version's location ~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher not the non-Flatpak's location ~/.local/share/PrismLauncher
 
@@ -25,7 +25,7 @@ Additionally, the scripts accepts settings in the form of environment variables 
 
 AUDIO_BACKEND - Can be "pipewire", "pulseaudio", "none", or "both" defines which audio system to share with the sandbox, defaults to "none"
 
-ENABLE_DISCORD - Can be either "true" or "false", when true, tries to bind $XDG_RUNTIME_DIR/discord-ipc-0 to the sandbox, useful if you want Discord Rich Presence, if $XDG_RUNTIME_DIR/discord-ipc-0 is a symlink, the script will attempt derefernce links and bind the actual socket file
+ENABLE_DISCORD - Can be either "true" or "false", when true, tries to bind $XDG_RUNTIME_DIR/discord-ipc-0 to the sandbox, useful if you want Discord Rich Presence, if $XDG_RUNTIME_DIR/discord-ipc-0 is a symlink, the script will attempt derefernce links and bind the actual socket file, defaults to "false"
 
 DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, defaults to "true" 
 
