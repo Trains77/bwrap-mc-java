@@ -8,6 +8,13 @@ SUB_USERID="$(id -u)"
 SANDBOX_HOSTNAME="$(hostname)"
 # PRISMLAUNCHER_FOLDER=/custom/path/to/folder
 
+# If path contains a space, the script will probably not work and cause Minecraft to crash with a vague error message
+if [[ "$INST_MC_DIR" = *" "* ]]; then
+echo ERROR: The following Instance path \""$INST_MC_DIR"\" has a space in it!
+echo This is usually caused by your instance\'s folder name having a space in it, try renaming it to not have a space and try again, this will not effect the name it has inside the launcher
+exit 1
+fi
+
 # If PRISMLAUNCHER_FOLDER not set above, try to figure out where it is
 if [ -z ${PRISMLAUNCHER_FOLDER+x} ]; then
 
