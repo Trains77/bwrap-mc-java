@@ -15,9 +15,8 @@ Do note this script is made primarily made for my own personal use, so there are
 - Sandbox assumes by default that the vpn interface is wg0-mullvad, and non-vpn interface is wlan0, you can set these 2 variables near the top of the script
 - Instances whose paths include a space do not work
 - Some versions or mods may not work with the sandbox
-	+ Mods that self update themselves might not work 
+	+ Mods that self update might not work 
 - The script will try to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf if it exists
-- The PRISMLAUNCHER_FOLDER variable stored inside the script is set to the Flatpak version's location ~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher not the non-Flatpak's location ~/.local/share/PrismLauncher
 
 ## Variables
 

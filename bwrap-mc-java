@@ -5,9 +5,24 @@ VPN_INTERFACE=wg0-mullvad
 WAN_INTERFACE=wlan0
 # SUB_USERID=3581
 SUB_USERID="$(id -u)"
-SANDBOX_HOSTNAME=orangepc
-# PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+SANDBOX_HOSTNAME="$(hostname)"
+# PRISMLAUNCHER_FOLDER=/custom/path/to/folder
+
+# If PRISMLAUNCHER_FOLDER not set above, try to figure out where it is
+if [ -z ${PRISMLAUNCHER_FOLDER+x} ]; then
+
+# Try to figure out where PrismLauncher's data folder is
+if [[ "$INST_DIR" = "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"* ]]; then
+PRISMLAUNCHER_FOLDER="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+
+elif [[ "$INST_DIR" = "$HOME/.local/share/PrismLauncher"* ]]; then
 PRISMLAUNCHER_FOLDER="$HOME/.local/share/PrismLauncher"
+
+else
+# If we don't know, set a default that should work in *most* cases
+PRISMLAUNCHER_FOLDER="$INST_DIR/../../"
+fi
+fi
 
 # Make sure some variables are cleared, and set additional variables needed
 unset X11_FLAGS
