@@ -41,7 +41,7 @@ unset SOMMELIER_PID
 unset SLIRP_ADDITIONAL_ARGS
 USERID="$(id -u)"
 
-# Check to make sure ~/.sandboxing/seccomp_default_filter.bpf exists, and if it doesn't, use /dev/null to prevent erroring out
+# Check to see if ~/.sandboxing/seccomp_default_filter.bpf exists, and if it does, use it as a filter for the sandbox
 if test -f ~/.sandboxing/seccomp_default_filter.bpf; then
 export SECCOMP_FILTER_ARGS="--seccomp 10"
 export SECCOMP_FILE_PATH="$HOME/.sandboxing/seccomp_default_filter.bpf"
@@ -62,6 +62,7 @@ DISCORD_TRUE_PATH="$(realpath $XDG_RUNTIME_DIR/discord-ipc-0)"
 DISCORD_BIND_ARGS="--ro-bind-try $DISCORD_TRUE_PATH $XDG_RUNTIME_DIR/discord-ipc-0"
 fi
 
+# Arguments to allow X11 access
 if [ "$SHARE_X11" = true ]; then
 export X11_FLAGS="--bind /tmp/.X11-unix /tmp/.X11-unix --ro-bind /usr/bin/xrandr /usr/bin/xrandr --setenv DISPLAY $DISPLAY --setenv XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID} --ro-bind $XAUTHORITY ${XAUTHORITY//"$(id -u)"/$SUB_USERID}"
 elif [ "$SHARE_X11" = "sommelier" ]; then
@@ -71,6 +72,7 @@ export SOMMELIER_PID=$(echo $!)
 sleep .3
 fi
 
+# Arguments to allow pipewire, pulseaudio, or both
 if [ "$AUDIO_BACKEND" = "pipewire" ]; then
 AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/$SUB_USERID/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire"
 elif [ "$AUDIO_BACKEND" = "pulseaudio" ]; then
@@ -79,34 +81,40 @@ elif [ "$AUDIO_BACKEND" = "both" ]; then
 AUDIO_FLAGS="--ro-bind /run/user/$USERID/pipewire-0 /run/user/$SUB_USERID/pipewire-0 --ro-bind /usr/share/pipewire /usr/share/pipewire --ro-bind /run/user/$USERID/pulse /run/user/$SUB_USERID/pulse"
 fi
 
+# Arguments to disable or enable networking
 if [ "$DISABLE_NETWORKING" = true ]; then
 export ENABLE_NETWORKING="--unshare-net"
 else
 export ENABLE_NETWORKING="--share-net"
 fi
 
+# Controls if the hosts's loopback should be available to the sandbox
 if ! [ "$DISABLE_LOOPBACK" = false ]; then
 export SLIRP_ADDITIONAL_ARGS="--disable-host-loopback $SLIRP_ADDITIONAL_ARGS"
 else
 echo Host Loopback IP is 10.0.2.2
 fi
 
+# Try to force the sandbox to use a VPN connection
 if [ "$VPN_CONNECT_ONLY" = "true" ]; then
 export SLIRP_ADDITIONAL_ARGS="--outbound-addr=$VPN_INTERFACE $SLIRP_ADDITIONAL_ARGS"
 elif [ "$VPN_CONNECT_ONLY" = "force-disabled" ]; then
 export SLIRP_ADDITIONAL_ARGS="--outbound-addr=$WAN_INTERFACE $SLIRP_ADDITIONAL_ARGS"
 fi
 
+# Bind some ~/.minecraft folders to the sandbox, useful if you symlink to them
 if [ "$BIND_HOME_MINECRAFT_FOLDER_ITEMS" = "true" ]; then
 export MINECRAFT_SHARE_ARGS="--bind-try $HOME/.minecraft/screenshots $HOME/.minecraft/screenshots --bind-try $HOME/.minecraft/saves $HOME/.minecraft/saves --bind-try $HOME/.minecraft/shaderpacks $HOME/.minecraft/shaderpacks --bind-try $HOME/.minecraft/optionsof.txt $HOME/.minecraft/optionsof.txt --ro-bind-try $HOME/.minecraft/resourcepacks $HOME/.minecraft/resourcepacks"
 fi
 
+# Additional folders to bind to the sandbox
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS; do
 export BIND_ADDITIONAL_FOLDER_ARGS="--bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
 done
 fi
 
+# same as above, but read only
 if ! [ -z ${BIND_ADDITIONAL_FOLDERS_RO+x} ]; then
 for i in $BIND_ADDITIONAL_FOLDERS_RO; do
 export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_ARGS"
