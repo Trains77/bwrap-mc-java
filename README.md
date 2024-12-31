@@ -26,13 +26,16 @@ AUDIO_BACKEND - Can be "pipewire", "pulseaudio", "none", or "both" defines which
 
 ENABLE_DISCORD - Can be either "true" or "false", when true, tries to bind $XDG_RUNTIME_DIR/discord-ipc-0 to the sandbox, useful if you want Discord Rich Presence, if $XDG_RUNTIME_DIR/discord-ipc-0 is a symlink, the script will attempt derefernce links and bind the actual socket file, defaults to "false"
 
-DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, defaults to "true" 
+DISABLE_LOOPBACK - Can be either "true" or "false", defines Whether or not the sandbox should be able to reach the host's loopback address, does not work if NETWORK_DIRECT_CONNECT is true, defaults to "true" 
 
 DISABLE_NETWORKING - Can be either either "true" or "false", defines whether or not the sandbox should get any networking, defaults to false
+
+NETWORK_DIRECT_CONNECT - If Minecraft should have access to all network interfaces like an unsandboxed program would, requires DISABLE_NETWORKING to be false.
 
 SHARE_X11 - Can be "true", "sommelier", or "false". Defines whether or not the sandbox should get direct access to the X11 server, a sandboxed X11 server through Sommelier, or no X11 server at all, defaults to false
 
 MORE_VERBOSE - Does nothing, defaults to false
+
 
 VPN_CONNECT_ONLY - Can be either "true", "force-disabled", or "false", Defines if Minecraft should be forced to use a vpn connection, force-disabled tries to force the sandbox to *not* use the vpn, defaults to false
 

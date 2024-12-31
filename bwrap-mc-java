@@ -88,6 +88,14 @@ else
 export ENABLE_NETWORKING="--share-net"
 fi
 
+# Arguments to disable or enable networking
+if [ "$NETWORK_DIRECT_CONNECT" == "true" ]; then
+export FIRST_ARGS_NETWORKING="--share-net"
+else
+export FIRST_ARGS_NETWORKING="--unshare-net"
+export NETWORK_DIRECT_CONNECT=false
+fi
+
 # Controls if the hosts's loopback should be available to the sandbox
 if ! [ "$DISABLE_LOOPBACK" = false ]; then
 export SLIRP_ADDITIONAL_ARGS="--disable-host-loopback $SLIRP_ADDITIONAL_ARGS"
@@ -123,16 +131,16 @@ fi
 
 # Nested bwrap because permission issues I got with using slirp4netns directly on the sandbox, you can use this method to run slirp4netns on Flatpak apps as well!
 # the first bwrap is meant to have --unshare-net regardless of networking settings
-bwrap --dev-bind / / --unshare-net --die-with-parent bwrap \
+bwrap --dev-bind / / $FIRST_ARGS_NETWORKING --die-with-parent bwrap \
 --perms 0555 \
 --tmpfs / \
 --die-with-parent \
---tmpfs /tmp \
 --ro-bind "$INST_DIR" "$INST_DIR" \
 --bind "$INST_MC_DIR" "$INST_MC_DIR" \
 --ro-bind-try "$INST_MC_DIR/coremods" "$INST_MC_DIR/coremods" \
 --ro-bind-try "$INST_MC_DIR/mods" "$INST_MC_DIR/mods" \
 --tmpfs "$INST_MC_DIR/.cache" \
+--tmpfs /tmp \
 --clearenv \
 --perms 700 \
 --tmpfs /run/user/$SUB_USERID \
@@ -207,14 +215,19 @@ export SANDBOX_PID="$(pgrep -P $!)"
 echo Sandbox Process PID: $SANDBOX_PID
 
 # get slirp4netns running for networking
+if [ "$NETWORK_DIRECT_CONNECT" == "false" ]; then
 slirp4netns --configure $SLIRP_ADDITIONAL_ARGS --disable-dns $SANDBOX_PID eth0 &
 export SLIRP4NET_PID=$(echo $!)
-
+else
+echo Not starting Slirp4netns
+fi
 # Wait for Minecraft to exit before continuing
 wait $BWRAP_PID
 
-# Minecraft should have stopped by now, so terminate any remaining processes there may be
+# Minecraft should have stopped by now, so cleanup any remaining processes there may be
+if [ "$NETWORK_DIRECT_CONNECT" == "false" ]; then
 kill -SIGHUP $SLIRP4NET_PID
+fi
 if [ "$SHARE_X11" = "sommelier" ]; then
 kill -SIGTERM $SOMMELIER_PID
 fi
