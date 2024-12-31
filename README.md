@@ -6,9 +6,11 @@ Tries to sandbox Minecraft in a per instance way in PrismLauncher
 
 The goal of the script is to provide stronger sandboxing by isolating just the Minecraft game itself, and not the launcher
 
-The script requires both bwrap and slirp4netns, can also optionally use Sommelier for X11 sandboxing,
+The script requires bwrap, optionally slirp4netns for Network isolation, can also optionally use Sommelier for X11 sandboxing,
 
 To use the script, set it to be the wrapper command in your launcher's settings
+
+![image](Screenshots/screenshot1.png)
 
 Do note this script is made primarily made for my own personal use, so there are some things in it that I use/want that you may want to change or remove
 
@@ -17,6 +19,7 @@ Do note this script is made primarily made for my own personal use, so there are
 - Some versions or mods may not work with the sandbox
 	+ Mods that self update might not work 
 - The script will try to load a seccomp filter from ~/.sandboxing/seccomp_default_filter.bpf if it exists
+- If slirp4netns is not installed, you need to set NETWORK_DIRECT_CONNECT to true in order for Minecraft to access the internet
 
 ## Variables
 
