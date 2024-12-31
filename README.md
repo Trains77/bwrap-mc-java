@@ -35,6 +35,8 @@ DISABLE_NETWORKING - Can be either either "true" or "false", defines whether or 
 
 NETWORK_DIRECT_CONNECT - If Minecraft should have access to all network interfaces like an unsandboxed program would, requires DISABLE_NETWORKING to be false.
 
+PERSISTANT_CACHE - If the cache folder in the Minecraft directory should be persistant, defaults to false
+
 SHARE_X11 - Can be "true", "sommelier", or "false". Defines whether or not the sandbox should get direct access to the X11 server, a sandboxed X11 server through Sommelier, or no X11 server at all, defaults to false
 
 MORE_VERBOSE - Does nothing, defaults to false

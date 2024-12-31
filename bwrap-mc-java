@@ -88,12 +88,17 @@ else
 export ENABLE_NETWORKING="--share-net"
 fi
 
-# Arguments to disable or enable networking
+# Arguments to allow direct access to network interfaces
 if [ "$NETWORK_DIRECT_CONNECT" == "true" ]; then
 export FIRST_ARGS_NETWORKING="--share-net"
 else
 export FIRST_ARGS_NETWORKING="--unshare-net"
 export NETWORK_DIRECT_CONNECT=false
+fi
+
+# If MC cache folder should be tmpfs or not
+if ! [ "$PERSISTANT_CACHE" = true ]; then
+export SLIRP_ADDITIONAL_ARGS="--tmpfs $INST_MC_DIR/.cache $SLIRP_ADDITIONAL_ARGS"
 fi
 
 # Controls if the hosts's loopback should be available to the sandbox
@@ -139,7 +144,6 @@ bwrap --dev-bind / / $FIRST_ARGS_NETWORKING --die-with-parent bwrap \
 --bind "$INST_MC_DIR" "$INST_MC_DIR" \
 --ro-bind-try "$INST_MC_DIR/coremods" "$INST_MC_DIR/coremods" \
 --ro-bind-try "$INST_MC_DIR/mods" "$INST_MC_DIR/mods" \
---tmpfs "$INST_MC_DIR/.cache" \
 --tmpfs /tmp \
 --clearenv \
 --perms 700 \
