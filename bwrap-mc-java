@@ -136,9 +136,16 @@ export BIND_ADDITIONAL_FOLDER_RO_ARGS="--ro-bind $i $i $BIND_ADDITIONAL_FOLDER_A
 done
 fi
 
+# clamdscan --fdpass -m --infected "$INST_MC_DIR/mods" "$INST_MC_DIR/coremods" "$INST_MC_DIR/essential/libraries" "$INST_MC_DIR/essential/lwjgl3-natives" "$INST_MC_DIR/essential/loader" "$INST_MC_DIR/downloads"
+# export CLAMAV_CODE="$?"
+#if [ "$CLAMAV_CODE" == "1" ]
+#	echo Malware found! Refusing to start
+#	exit 8
+#fi
+
 # Nested bwrap because permission issues I got with using slirp4netns directly on the sandbox, you can use this method to run slirp4netns on Flatpak apps as well!
 # the first bwrap is meant to have --unshare-net regardless of networking settings
-bwrap --dev-bind / / $FIRST_ARGS_NETWORKING --die-with-parent bwrap \
+bwrap --dev-bind / / $FIRST_ARGS_NETWORKING --die-with-parent --dir "$INST_MC_DIR/workdir" --dir "$INST_MC_DIR/libraries" bwrap \
 --perms 0555 \
 --tmpfs / \
 --die-with-parent \
@@ -154,7 +161,8 @@ $X11_FLAGS \
 --ro-bind $PRISMLAUNCHER_FOLDER/assets $PRISMLAUNCHER_FOLDER/assets \
 --bind $PRISMLAUNCHER_FOLDER/assets/skins $PRISMLAUNCHER_FOLDER/assets/skins \
 --ro-bind $PRISMLAUNCHER_FOLDER/assets/indexes $PRISMLAUNCHER_FOLDER/assets/indexes \
---ro-bind $PRISMLAUNCHER_FOLDER/libraries $PRISMLAUNCHER_FOLDER/libraries \
+--overlay-src $PRISMLAUNCHER_FOLDER/libraries \
+--overlay "$INST_MC_DIR/libraries" "$INST_MC_DIR/workdir" "$PRISMLAUNCHER_FOLDER/libraries" \
 --ro-bind $PRISMLAUNCHER_FOLDER/icons $PRISMLAUNCHER_FOLDER/icons \
 --ro-bind $PRISMLAUNCHER_FOLDER/meta $PRISMLAUNCHER_FOLDER/meta \
 $BIND_ADDITIONAL_FOLDER_ARGS \
